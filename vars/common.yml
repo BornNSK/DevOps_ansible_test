@@ -1,0 +1,64 @@
+web_packages:
+  - nginx
+  - mysql-server=8.0.36-0ubuntu0.20.04.1
+
+# Set current domain for applications
+site_domain: my.unique.domain
+
+laravel_application_path: "/var/www/laravel"
+laravel_version: "11.x"
+
+custom_firewall_restore_path: "/usr/local/sbin/custom.firewall-restore"
+custom_firewall_service_path: "/etc/systemd/system/custom-firewall.service"
+
+# App settings
+app_key: "base64:NzPRVBohec9ZnMz6/neQ5OeGkJwV1ElqVawxQcV5img="
+app_env: "local"
+app_debug: "true"
+app_timezone: "Europe/Moscow"
+app_name: '"My Custom laravel app"'
+
+# Db settings for create user with ansible
+db_socket: "/var/run/mysqld/mysqld.sock"
+db_name: laravel
+db_user: laravel
+db_password: "qweqwe123123qwe"
+
+# Need for added php-fpm apt repo
+phpfpm_required_packages:
+  - gnupg
+  - gnupg1
+  - gnupg2
+
+# Not every system can have iptables installed
+security_packages:
+  - iptables
+
+public_tcp_port:
+  - 22
+  - 80
+  - 443
+
+composer_version: "2.7.2"
+composer_url: "https://getcomposer.org/download/{{ composer_version }}/composer.phar"
+composer_path: "/usr/local/bin/composer"
+
+phpfpm_packages:
+  - php8.2-xml
+  - php8.2-curl
+  - php8.2-mbstring
+  - php8.2-bcmath
+  - php8.2-ctype
+  - php8.2-tokenizer
+  - php8.2-fpm
+  - php8.2-zip
+  - php8.2-mysql
+  - python3-pymysql
+  - git
+  - zip
+  - unzip
+
+phpfpm_ppa: ppa:ondrej/php
+
+ubuntu_authorized_public_keys:
+  - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAgEA0USmj/khKnAmpgeLVlbB6itFr+4/ok2z7sbtEKtZZY+19a3D7fE8F1PU5z1kWALIvRo7p/3kkEN8FCKv86cS8jCv82B5OXhAeLgU/oisCXsIrCvQMbPyUKl7bNx4u3BA8HjtCVsOE6zzzvKG6BXKdNTJqbDMNIY33CkDcj1uWo8Buh5WgUxjvnP5YBmqdPHX1I8E7QLL+d5H6bdUCPQ71URY2cmqvO4IoMwuxrOBJ3c9Ucsw3GCwaNHoPIEkOuTKpRbI951ovqkjDH9/PQgox0HFZ2G1srSS/fPrJizrhJTDjsj5OMFpxbpv0zptMosrStM0MFEBkHRzu6p7b/LHTcNtIHM6OQSqw7DG/07dfXXNrhiqyrZLYg019rYJxN+fOzEdm121aLw/SIOKOzVh3hQuVC7rq4yIdvZXu+W/RRKylYkChpWOsABWqjfCY/bMHpU0+PnFIbCoua/1ZoovTMXsYYtxto/6xGysuVovO0fxYFoxvk54K4TtnO59GCo9UUgQBC+HIqtUW3ycP2lOvjfA6iY3DPGYDvlSG8FhxcMVuWfZ3UYEiUfPYFqzuygf2RgUXI6gFtIHeqsO7kXQ1ii28yXM69rcNoTjD/xeb5u+42u+szwccAYcsXzn5C1BB0CGBhUtHzzUm9+Qiby03KvKgWl8287GIk1/9QlATYk=

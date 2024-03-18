@@ -1,0 +1,23 @@
+#!/bin/bash
+
+{{ ansible_managed | comment }}
+
+# IPv4
+
+iptables -F
+iptables -X
+
+iptables -A INPUT -p tcp -m multiport --dports {{ public_tcp_port|join(',') }}
+
+iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+iptables -A INPUT -j DROP
+
+# IPv6
+
+ip6tables -F
+ip6tables -X
+
+ip6tables -A INPUT -p tcp -m multiport --dports {{ public_tcp_port|join(',') }}
+
+ip6tables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+ip6tables -A INPUT -j DROP

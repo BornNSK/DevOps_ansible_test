@@ -1,0 +1,72 @@
+---
+- name: Install required packages
+  apt:
+    name: "{{ phpfpm_required_packages }}"
+
+- name: add ppa
+  apt_repository:
+    repo: "{{ phpfpm_ppa }}"
+    state: "present"
+
+- name: install packages
+  apt:
+    name: "{{ phpfpm_packages }}"
+    update_cache: yes
+
+- name: install composer
+  get_url:
+    url: "{{ composer_url }}"
+    dest: "{{ composer_path }}"
+    mode: "0755"
+
+- name: Create laravel database
+  mysql_db:
+    name: "{{ db_name }}"
+    login_unix_socket: "{{ db_socket }}"
+    state: present
+
+- name: Create laravel mysql user
+  mysql_user:
+    name: "{{ db_user }}"
+    password: "{{ db_password }}"
+    priv: '{{ db_name }}.*:ALL'
+    state: present
+    login_unix_socket: "{{ db_socket }}"
+
+- name: Clone Laravel framework from GitHub
+  git:
+    repo: https://github.com/laravel/laravel.git
+    dest: "{{ laravel_application_path }}"
+    version: 11.x
+
+- name: Copy env app
+  template:
+    src: "app.env.j2"
+    dest: "{{ laravel_application_path }}/.env"
+
+- name: Composer install
+  community.general.composer:
+    command: install
+    working_dir: "{{ laravel_application_path }}"
+  environment:
+    COMPOSER_NO_INTERACTION: "1"
+    COMPOSER_ALLOW_SUPERUSER: "1"
+
+- name: Fixing owner on laravel dir
+  file:
+    path: "{{ item }}"
+    owner: www-data
+    group: www-data
+    recurse: true
+  with_items:
+    - "{{ laravel_application_path}}/storage"
+    - "{{ laravel_application_path }}/bootstrap/cache"
+
+- name: Start and enable php-fpm
+  service:
+    state: started
+    enabled: true
+    name: php8.2-fpm
+
+- name: Migrate table
+  command: "php /var/www/laravel/artisan migrate"

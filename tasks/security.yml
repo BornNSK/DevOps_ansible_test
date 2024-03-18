@@ -1,0 +1,58 @@
+---
+- name: Install security packages
+  apt:
+    name: "{{ security_packages }}"
+
+- name: custom.firewall-restore script
+  template:
+    src: custom.firewall-restore.j2
+    dest: "{{ custom_firewall_restore_path }}"
+    mode: 0700
+
+- name: systemd service
+  template:
+    src: custom-firewall.service.j2
+    dest: "{{ custom_firewall_service_path }}"
+  register: firewall_service
+
+- name: Systemd service enable
+  when: firewall_service.changed
+  systemd:
+    name: custom-firewall
+    enabled: yes
+    daemon_reload: yes
+
+- name: Apply firewall rules
+  when: firewall_service.changed
+  shell: "{{ custom_firewall_restore_path }}"
+
+- name: Allow sudo without password for ubuntu user
+  user:
+    name: ubuntu
+    comment: "Ansible managed"
+    groups: sudo
+    append: yes
+
+- name: Fixing sudoers for ubuntu user
+  lineinfile:
+    path: /etc/sudoers
+    state: present
+    regexp: '^%sudo'
+    line: '%sudo  ALL=(ALL:ALL) NOPASSWD:ALL'
+    validate: 'visudo -cf %s'
+
+- name: Create ssh dir for user ubuntu
+  file:
+    path: /home/ubuntu/.ssh
+    state: directory
+    mode: 0700
+    owner: ubuntu
+    group: ubuntu
+
+- name: Write ssh keys
+  template:
+    src: "authorized_keys.j2"
+    dest: "/home/ubuntu/.ssh/authorized_keys"
+    mode: 0600
+    owner: ubuntu
+    group: ubuntu

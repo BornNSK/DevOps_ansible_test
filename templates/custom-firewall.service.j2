@@ -1,0 +1,13 @@
+{{ ansible_managed | comment }}
+
+[Unit]
+Description=A oneshot service to load iptables rules
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart={{ custom_firewall_restore_path }}
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

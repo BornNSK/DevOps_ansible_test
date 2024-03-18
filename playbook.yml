@@ -1,0 +1,25 @@
+---
+- name: Configure Server
+  hosts: all #client01
+  #remote_user: ubuntu
+  #become: yes
+  #become_method: sudo
+  vars_files:
+    - vars/common.yml
+  tasks:
+    # Install nginx + mysql and configure nginx.
+    - name: Configure web
+      import_tasks: tasks/web.yml
+    # Install php and configure laravel applications.
+    - name: Configure laravel
+      import_tasks: tasks/laravel.yml
+    # Create user ubuntu, fixing sudoers and configure firewall
+    - name: Configure security
+      import_tasks: tasks/security.yml
+
+  handlers:
+    - name: reload nginx
+      # shell: "nginx -t && nginx -s reload"
+      service:
+        name: nginx
+        state: reloaded
